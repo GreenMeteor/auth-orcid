@@ -1,0 +1,21 @@
+{
+    "id": "auth-orcid",
+    "version": "1.0.0",
+    "name": "ORCID Authentication",
+    "description": "Adds ORCID authentication support to HumHub.",
+    "humhub": {
+        "minVersion": "1.8"
+    },
+    "keywords": ["authentication", "orcid", "oauth"],
+    "screenshots": ["resources/screenshot.png"],
+    "homepage": "https://greenmeteor.net/",
+    "authors": [
+        {
+            "name": "Green Meteor",
+            "email": "hello@https://greenmeteor.net",
+            "homepage": "https://https://greenmeteor.net",
+            "role": "Developer"
+        }
+    ],
+    "licence": "AGPL-3.0-or-later"
+}
