@@ -22,14 +22,23 @@ class OrcidClient extends OAuth2
 
     protected function initScope()
     {
-        $scope = ['/authenticate'];
+        // Initialize with correct format - no leading slash for first scope
+        $scope = ['authenticate'];
+        
         if ($this->isFeatureEnabled('enableProfileSync')) {
-            $scope[] = '/read-limited';
+            $scope[] = 'read-limited';
         }
+        
         if ($this->isFeatureEnabled('enableWorksFetch') || $this->isFeatureEnabled('enableWorksUpdate')) {
-            $scope[] = '/activities/update';
+            $scope[] = 'activities/update';
         }
-        $this->scope = implode(' ', $scope);
+        
+        // Properly format scopes with leading slash for ORCID API
+        $formattedScope = array_map(function($item) {
+            return '/' . $item;
+        }, $scope);
+        
+        $this->scope = implode(' ', $formattedScope);
     }
 
     protected function initUserAttributes()
@@ -51,7 +60,7 @@ class OrcidClient extends OAuth2
                 'employment' => $employment,
             ];
         }
-        return [];
+        return ['orcid' => $this->getOrcid()];
     }
 
     protected function extractName($person)
@@ -78,7 +87,8 @@ class OrcidClient extends OAuth2
 
     protected function extractCountry($person)
     {
-        return $person['addresses']['address'][0]['country']['value'] ?? null;
+        $addresses = $person['addresses']['address'] ?? [];
+        return !empty($addresses) ? ($addresses[0]['country']['value'] ?? null) : null;
     }
 
     protected function extractKeywords($person)
@@ -94,8 +104,8 @@ class OrcidClient extends OAuth2
         $urls = $person['researcher-urls']['researcher-url'] ?? [];
         return array_map(function($url) {
             return [
-                'name' => $url['url-name'],
-                'value' => $url['url']['value'],
+                'name' => $url['url-name'] ?? null,
+                'value' => $url['url']['value'] ?? null,
             ];
         }, $urls);
     }
@@ -152,7 +162,8 @@ class OrcidClient extends OAuth2
     {
         if ($this->isFeatureEnabled('enableProfileSync')) {
             $educations = $this->api($this->getOrcid() . '/educations', 'GET');
-            return $this->formatAffiliations($educations['education-summary']);
+            return isset($educations['education-summary']) ? 
+                $this->formatAffiliations($educations['education-summary']) : [];
         }
         return null;
     }
@@ -161,28 +172,40 @@ class OrcidClient extends OAuth2
     {
         if ($this->isFeatureEnabled('enableProfileSync')) {
             $employments = $this->api($this->getOrcid() . '/employments', 'GET');
-            return $this->formatAffiliations($employments['employment-summary']);
+            return isset($employments['employment-summary']) ? 
+                $this->formatAffiliations($employments['employment-summary']) : [];
         }
         return null;
     }
 
     protected function formatAffiliations($affiliations)
     {
+        if (!is_array($affiliations)) {
+            return [];
+        }
+        
         return array_map(function($affiliation) {
             return [
-                'organization' => $affiliation['organization']['name'],
-                'department' => $affiliation['department-name'],
-                'title' => $affiliation['role-title'],
-                'start-date' => $this->formatDate($affiliation['start-date']),
-                'end-date' => $this->formatDate($affiliation['end-date']),
+                'organization' => $affiliation['organization']['name'] ?? null,
+                'department' => $affiliation['department-name'] ?? null,
+                'title' => $affiliation['role-title'] ?? null,
+                'start-date' => $this->formatDate($affiliation['start-date'] ?? null),
+                'end-date' => $this->formatDate($affiliation['end-date'] ?? null),
             ];
         }, $affiliations);
     }
 
     protected function formatDate($date)
     {
-        if (!$date) return null;
-        return sprintf('%04d-%02d-%02d', $date['year']['value'], $date['month']['value'], $date['day']['value']);
+        if (empty($date) || !isset($date['year']['value']) || !isset($date['month']['value']) || !isset($date['day']['value'])) {
+            return null;
+        }
+        
+        return sprintf('%04d-%02d-%02d', 
+            $date['year']['value'], 
+            $date['month']['value'], 
+            $date['day']['value']
+        );
     }
 
     protected function defaultReturnUrl()
