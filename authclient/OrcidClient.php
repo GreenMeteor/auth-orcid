@@ -3,195 +3,232 @@
 namespace humhub\modules\auth\orcid\authclient;
 
 use Yii;
-use yii\helpers\Json;
 use yii\authclient\OAuth2;
-use yii\authclient\OAuthToken;
+use humhub\modules\user\models\User;
+use humhub\modules\user\models\ProfileField;
+use humhub\modules\auth\orcid\models\ConfigureForm;
 
+/**
+ * ORCID authentication client for HumHub
+ *
+ * @see https://info.orcid.org/documentation/integration-guide/
+ */
 class OrcidClient extends OAuth2
 {
-    public $authUrl = 'https://orcid.org/oauth/authorize';
-    public $tokenUrl = 'https://orcid.org/oauth/token';
-    public $apiBaseUrl = 'https://api.orcid.org/v3.0';
-    public $scope = '/authenticate';
+    /**
+     * @inheritdoc
+     */
+    public $authUrl;
 
+    /**
+     * @inheritdoc
+     */
+    public $tokenUrl;
+
+    /**
+     * @inheritdoc
+     */
+    public $apiBaseUrl;
+
+    /**
+     * @inheritdoc
+     */
+    public $revokeUrl;
+
+    /**
+     * @inheritdoc
+     */
+    public $scope;
+
+
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         parent::init();
-        $this->initScope();
-    }
 
-    protected function initScope()
-    {
-        $scope = ['/authenticate'];
-        if ($this->isFeatureEnabled('enableProfileSync')) {
-            $scope[] = '/read-limited';
+        $config = ConfigureForm::getInstance();
+
+        if ($config->enabled) {
+            $this->authUrl = 'https://orcid.org/oauth/authorize';
+            $this->tokenUrl = 'https://orcid.org/oauth/token';
+            $this->apiBaseUrl = 'https://pub.orcid.org/v3.0';
+            $this->scope = $config->scopes;
+            $this->clientId = $config->clientId;
+            $this->clientSecret = $config->clientSecret;
+            $this->autoRefreshAccessToken = true;
         }
-        if ($this->isFeatureEnabled('enableWorksFetch') || $this->isFeatureEnabled('enableWorksUpdate')) {
-            $scope[] = '/activities/update';
-        }
-        $this->scope = implode(' ', $scope);
     }
 
-    protected function initUserAttributes()
-    {
-        if ($this->isFeatureEnabled('enableProfileSync')) {
-            $person = $this->api($this->getOrcid() . '/person', 'GET');
-            $education = $this->fetchEducation();
-            $employment = $this->fetchEmployment();
-            
-            return [
-                'orcid' => $this->getOrcid(),
-                'name' => $this->extractName($person),
-                'email' => $this->extractEmail($person),
-                'biography' => $this->extractBiography($person),
-                'country' => $this->extractCountry($person),
-                'keywords' => $this->extractKeywords($person),
-                'website' => $this->extractWebsite($person),
-                'education' => $education,
-                'employment' => $employment,
-            ];
-        }
-        return [];
-    }
-
-    protected function extractName($person)
-    {
-        $name = $person['name'] ?? [];
-        return [
-            'given-names' => $name['given-names']['value'] ?? null,
-            'family-name' => $name['family-name']['value'] ?? null,
-        ];
-    }
-
-    protected function extractEmail($person)
-    {
-        $emails = $person['emails']['email'] ?? [];
-        return array_map(function($email) {
-            return $email['email'];
-        }, $emails);
-    }
-
-    protected function extractBiography($person)
-    {
-        return $person['biography']['content'] ?? null;
-    }
-
-    protected function extractCountry($person)
-    {
-        return $person['addresses']['address'][0]['country']['value'] ?? null;
-    }
-
-    protected function extractKeywords($person)
-    {
-        $keywords = $person['keywords']['keyword'] ?? [];
-        return array_map(function($keyword) {
-            return $keyword['content'];
-        }, $keywords);
-    }
-
-    protected function extractWebsite($person)
-    {
-        $urls = $person['researcher-urls']['researcher-url'] ?? [];
-        return array_map(function($url) {
-            return [
-                'name' => $url['url-name'],
-                'value' => $url['url']['value'],
-            ];
-        }, $urls);
-    }
-
+    /**
+     * @inheritdoc
+     */
     protected function defaultName()
     {
         return 'orcid';
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function defaultTitle()
     {
         return 'ORCID';
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function defaultViewOptions()
     {
         return [
-            'popupWidth' => 860,
-            'popupHeight' => 480,
+            'popupWidth' => 800,
+            'popupHeight' => 500,
+            'cssIcon' => 'fa fa-id-card',
+            'buttonBackgroundColor' => '#A6CE39',
         ];
     }
 
-    public function getOrcid()
+    /**
+     * @inheritdoc
+     */
+    protected function initUserAttributes()
     {
-        return $this->getAccessToken()->getParam('orcid');
-    }
+        $accessToken = $this->getAccessToken();
+        if (isset($accessToken->params['orcid'])) {
+            $orcid = $accessToken->params['orcid'];
 
-    protected function apiInternal($accessToken, $url, $method, array $params, array $headers)
-    {
-        $headers['Accept'] = 'application/vnd.orcid+json';
-        if ($method === 'POST' || $method === 'PUT') {
-            $headers['Content-Type'] = 'application/vnd.orcid+json';
-        }
-        return parent::apiInternal($accessToken, $url, $method, $params, $headers);
-    }
+            $response = $this->api("/$orcid/record", 'GET');
 
-    public function fetchWorks()
-    {
-        if ($this->isFeatureEnabled('enableWorksFetch')) {
-            return $this->api($this->getOrcid() . '/works', 'GET');
-        }
-        return null;
-    }
-
-    public function updateWork($workData)
-    {
-        if ($this->isFeatureEnabled('enableWorksUpdate')) {
-            return $this->api($this->getOrcid() . '/work', 'POST', Json::encode($workData));
-        }
-        return null;
-    }
-
-    public function fetchEducation()
-    {
-        if ($this->isFeatureEnabled('enableProfileSync')) {
-            $educations = $this->api($this->getOrcid() . '/educations', 'GET');
-            return $this->formatAffiliations($educations['education-summary']);
-        }
-        return null;
-    }
-
-    public function fetchEmployment()
-    {
-        if ($this->isFeatureEnabled('enableProfileSync')) {
-            $employments = $this->api($this->getOrcid() . '/employments', 'GET');
-            return $this->formatAffiliations($employments['employment-summary']);
-        }
-        return null;
-    }
-
-    protected function formatAffiliations($affiliations)
-    {
-        return array_map(function($affiliation) {
-            return [
-                'organization' => $affiliation['organization']['name'],
-                'department' => $affiliation['department-name'],
-                'title' => $affiliation['role-title'],
-                'start-date' => $this->formatDate($affiliation['start-date']),
-                'end-date' => $this->formatDate($affiliation['end-date']),
+            $attributes = [
+                'id' => $orcid,
+                'email' => null,
+                'name' => null,
+                'given_name' => null,
+                'family_name' => null,
             ];
-        }, $affiliations);
+
+            if (isset($response['person'])) {
+                $person = $response['person'];
+
+                if (isset($person['emails']['email'])) {
+                    foreach ($person['emails']['email'] as $email) {
+                        if (isset($email['email']) && isset($email['primary']) && $email['primary'] === true) {
+                            $attributes['email'] = $email['email'];
+                            break;
+                        }
+                    }
+
+                    if ($attributes['email'] === null && !empty($person['emails']['email'][0]['email'])) {
+                        $attributes['email'] = $person['emails']['email'][0]['email'];
+                    }
+                }
+
+                if (isset($person['name'])) {
+                    $name = $person['name'];
+
+                    if (isset($name['given-names']['value'])) {
+                        $attributes['given_name'] = $name['given-names']['value'];
+                    }
+
+                    if (isset($name['family-name']['value'])) {
+                        $attributes['family_name'] = $name['family-name']['value'];
+                    }
+
+                    $fullName = [];
+                    if (!empty($attributes['given_name'])) {
+                        $fullName[] = $attributes['given_name'];
+                    }
+                    if (!empty($attributes['family_name'])) {
+                        $fullName[] = $attributes['family_name'];
+                    }
+
+                    if (!empty($fullName)) {
+                        $attributes['name'] = implode(' ', $fullName);
+                    }
+                }
+            }
+
+            return $attributes;
+        }
+
+        return [];
     }
 
-    protected function formatDate($date)
+    /**
+     * @inheritdoc
+     */
+    public function applyAccessTokenToRequest($request, $accessToken)
     {
-        if (!$date) return null;
-        return sprintf('%04d-%02d-%02d', $date['year']['value'], $date['month']['value'], $date['day']['value']);
+        $request->getHeaders()->set('Authorization', 'Bearer ' . $accessToken->getToken());
     }
 
-    protected function defaultReturnUrl()
+    /**
+     * @inheritdoc
+     */
+    protected function defaultNormalizeUserAttributeMap()
     {
-        return Yii::$app->getUrlManager()->createAbsoluteUrl(['/auth/orcid/auth/index']);
+        return [
+            'id' => 'id',
+            'username' => 'id',
+            'email' => 'email',
+            'firstname' => 'given_name',
+            'lastname' => 'family_name',
+        ];
     }
 
-    protected function isFeatureEnabled($feature)
+    /**
+     * Store ORCID ID in user profile
+     *
+     * @param User $user
+     * @param array $attributes
+     */
+    public function afterSave($user, $attributes)
     {
-        return Yii::$app->settings->get("auth.orcid.{$feature}", true);
+        parent::afterSave($user, $attributes);
+
+        if (!empty($attributes['id'])) {
+            $orcidField = ProfileField::findOne(['internal_name' => 'orcid']);
+
+            if ($orcidField !== null) {
+                $profile = $user->profile;
+                $fieldName = 'orcid';
+
+                if ($profile->hasAttribute($fieldName)) {
+                    $profile->$fieldName = $attributes['id'];
+                    $profile->save();
+                }
+            }
+
+            if ($orcidField === null) {
+                Yii::$app->session->setFlash('info', Yii::t('AuthModule.base', 
+                    'User logged in with ORCID {orcid} - consider creating an ORCID profile field.', 
+                    ['orcid' => $attributes['id']]
+                ));
+            }
+        }
+    }
+
+    /**
+     * Get or create the profile field category ID for ORCID
+     * 
+     * @return int|null
+     */
+    private static function getProfileFieldCategoryId()
+    {
+        $category = \humhub\modules\user\models\ProfileFieldCategory::findOne(['title' => 'Academic']);
+
+        if ($category === null) {
+            $maxOrder = \humhub\modules\user\models\ProfileFieldCategory::find()->max('sort_order');
+            $category = new \humhub\modules\user\models\ProfileFieldCategory();
+            $category->title = 'Academic';
+            $category->description = 'Academic information';
+            $category->sort_order = $maxOrder + 1;
+            $category->visibility = 1;
+            $category->save();
+        }
+
+        return $category !== null ? $category->id : null;
     }
 }
