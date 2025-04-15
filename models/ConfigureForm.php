@@ -23,7 +23,7 @@ class ConfigureForm extends Model
     public function rules()
     {
         return [
-            //[['clientId', 'clientSecret'], 'required'],
+            [['clientId', 'clientSecret'], 'required'],
             [['clientId', 'clientSecret', 'orcidAttribute', 'scopes'], 'string'],
             [['enabled', 'enableAuthentication', 'enableProfileSync', 'enableWorksFetch', 'enableWorksUpdate', 'enableEducationSync', 'enableEmploymentSync'], 'boolean'],
         ];
@@ -54,9 +54,9 @@ class ConfigureForm extends Model
         $settings->set('clientId', $this->clientId);
         $settings->set('clientSecret', $this->clientSecret);
         
-        /* On saving, if no value is entered for orcidAttribute, then assign "orcid" to it.
-           Ideally, this should take place during form validation, by setting a default value
-           to the form-field, and then letting saving the configuration proceed as usual. */
+        // On saving, if no value is entered for orcidAttribute, then assign "orcid" to it.
+        // Ideally, this should take place during form validation, by setting a default value
+        // to the form-field, and then letting the saving of configuration to proceed as usual.
         if ($this->orcidAttribute == null) {
         	$this->orcidAttribute = 'orcid';
         }
