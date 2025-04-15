@@ -1,0 +1,46 @@
+{
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "type": "SoftwareSourceCode",
+    "author": [
+        {
+            "id": "https://github.com/ArchBlood",
+            "type": "Person",
+            "affiliation": {
+                "type": "Organization",
+                "name": "GreenMeteor"
+            },
+            "email": "kodo@greenmeteor.net",
+            "givenName": "ArchBlood"
+        },
+        {
+            "type": "schema:Role",
+            "schema:author": "https://github.com/ArchBlood",
+            "schema:roleName": "Developer"
+        }
+    ],
+    "codeRepository": "https://github.com/GreenMeteor/auth-orcid.git",
+    "contributor": [
+        {
+            "id": "https://orcid.org/0000-0003-3930-7811",
+            "type": "Person",
+            "email": "ahmad@gharbeia.org",
+            "familyName": "Gharbeia",
+            "givenName": "Ahmad"
+        },
+        {
+            "type": "schema:Role",
+            "contributor": "https://orcid.org/0000-0003-3930-7811",
+            "schema:roleName": "Developer"
+        }
+    ],
+    "dateCreated": "2025-04-16",
+    "dateModified": "2025-03-29",
+    "datePublished": "2024-12-13",
+    "description": "HumHub module for OAuth via ORCID.org",
+    "license": "https://spdx.org/licenses/LGPL-3.0+",
+    "name": "ORCID Authentication",
+    "programmingLanguage": "PHP",
+    "softwareRequirements": "https://github.com/humhub/humhub",
+    "version": "1.0.0",
+    "issueTracker": "https://github.com/GreenMeteor/auth-orcid/issues"
+}
