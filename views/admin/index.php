@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <li><?= Yii::t('AuthOrcidModule.base', 'Set the Redirect URI to: {redirectUri}', ['redirectUri' => Html::tag('code', Url::to(['/user/auth/external', 'authclient' => 'orcid'], true))]) ?></li>
             <li><?= Yii::t('AuthOrcidModule.base', 'Copy the provided Client ID and Client Secret to the relevant fields above.') ?></li>
             <li><?= Yii::t('AuthOrcidModule.base', 'Configure the desired features using the checkboxes above.') ?></li>
-            <li><?= Yii::t('AuthOrcidModule.base', 'Optionally, create a {adminLink} to hold users\' ORCIDs, and enter its internal name in the relevant field above.', ['adminllink' => Html::a('profile field', '/admin/user-profile', ['target' => '_blank'])]) ?></li>
+            <li><?= Yii::t('AuthOrcidModule.base', 'Optionally, create a {adminLink} to hold users\' ORCIDs, and enter its internal name in the relevant field above.', ['adminlink' => Html::a('profile field', '/admin/user-profile', ['target' => '_blank'])]) ?></li>
             <li><?= Yii::t('AuthOrcidModule.base', 'Save the settings.') ?></li>
         </ol>
         <p><?= Yii::t('AuthOrcidModule.base', 'Refer to the {docsLink} for more information on ORCID integration.', ['docsLink' => Html::a('ORCID API documentation', 'https://info.orcid.org/documentation/', ['target' => '_blank'])]) ?></p>
