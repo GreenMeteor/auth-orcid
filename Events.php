@@ -22,7 +22,8 @@ class Events
             $authClientCollection->setClient('orcid', [
                 'class' => OrcidClient::class,
                 'clientId' => ConfigureForm::getInstance()->clientId,
-                'clientSecret' => ConfigureForm::getInstance()->clientSecret
+                'clientSecret' => ConfigureForm::getInstance()->clientSecret,
+                'orcidAttribute' => ConfigureForm::getInstance()->orcidAttribute
             ]);
         }
     }

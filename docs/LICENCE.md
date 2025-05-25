@@ -1,2 +1,1 @@
-# Dual Licenses
-See: [Green Meteor Licenses](https://marketplace.greenmeteor.net/legal#licenses)
+[GPL-3.0 license](https://www.gnu.org/licenses/gpl-3.0.en.html)

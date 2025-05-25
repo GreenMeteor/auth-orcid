@@ -57,6 +57,7 @@ class OrcidClient extends OAuth2
             $this->scope = $config->scopes;
             $this->clientId = $config->clientId;
             $this->clientSecret = $config->clientSecret;
+            $this->orcidAttribute = $config->orcidAttribute;
             $this->autoRefreshAccessToken = true;
         }
     }
@@ -189,11 +190,11 @@ class OrcidClient extends OAuth2
         parent::afterSave($user, $attributes);
 
         if (!empty($attributes['id'])) {
-            $orcidField = ProfileField::findOne(['internal_name' => 'orcid']);
+            $fieldName = $this->orcidAttribute
+            $orcidField = ProfileField::findOne(['internal_name' => $this->$fieldName]);
 
             if ($orcidField !== null) {
                 $profile = $user->profile;
-                $fieldName = 'orcid';
 
                 if ($profile->hasAttribute($fieldName)) {
                     $profile->$fieldName = $attributes['id'];
@@ -202,6 +203,7 @@ class OrcidClient extends OAuth2
             }
 
             if ($orcidField === null) {
+            //This should never happen! (unless config was modified out of the system)
                 Yii::$app->session->setFlash('info', Yii::t('AuthModule.base', 
                     'User logged in with ORCID {orcid} - consider creating an ORCID profile field.', 
                     ['orcid' => $attributes['id']]

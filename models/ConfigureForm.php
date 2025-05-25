@@ -23,8 +23,8 @@ class ConfigureForm extends Model
     public function rules()
     {
         return [
-            //[['clientId', 'clientSecret'], 'required'],
-            [['clientId', 'clientSecret', 'scopes'], 'string'],
+            [['clientId', 'clientSecret'], 'required'],
+            [['clientId', 'clientSecret', 'orcidAttribute', 'scopes'], 'string'],
             [['enabled', 'enableAuthentication', 'enableProfileSync', 'enableWorksFetch', 'enableWorksUpdate', 'enableEducationSync', 'enableEmploymentSync'], 'boolean'],
         ];
     }
@@ -34,6 +34,7 @@ class ConfigureForm extends Model
         return [
             'enabled' => Yii::t('AuthOrcidModule.base', 'Enabled'),
             'clientId' => Yii::t('AuthOrcidModule.base', 'ORCID Client ID'),
+            'orcidAttribute' => Yii::t('AuthOrcidModule.base', 'Internal name of profile attribute to hold ORCIDs. If not entered, {orcidAttribute} will be used.', ['orcidAttribute' => Html::tag('code', 'orcid')]),
             'clientSecret' => Yii::t('AuthOrcidModule.base', 'ORCID Client Secret'),
             'enableAuthentication' => Yii::t('AuthOrcidModule.base', 'Enable ORCID Authentication'),
             'enableProfileSync' => Yii::t('AuthOrcidModule.base', 'Enable Profile Synchronization'),
@@ -52,6 +53,15 @@ class ConfigureForm extends Model
         $settings->set('enabled', (boolean)$this->enabled);
         $settings->set('clientId', $this->clientId);
         $settings->set('clientSecret', $this->clientSecret);
+        
+        // On saving, if no value is entered for orcidAttribute, then assign "orcid" to it.
+        // Ideally, this should take place during form validation, by setting a default value
+        // to the form-field, and then letting the saving of configuration to proceed as usual.
+        if ($this->orcidAttribute == null) {
+        	$this->orcidAttribute = 'orcid';
+        }
+        $settings->set('orcidAttribute', $this->orcidAttribute);
+        
         $settings->set('enableAuthentication', (boolean)$this->enableAuthentication);
         $settings->set('enableProfileSync', (boolean)$this->enableProfileSync);
         $settings->set('enableWorksFetch', (boolean)$this->enableWorksFetch);
@@ -68,6 +78,7 @@ class ConfigureForm extends Model
         $this->enabled = (boolean)$settings->get('enabled');
         $this->clientId = $settings->get('clientId');
         $this->clientSecret = $settings->get('clientSecret');
+        $this->orcidAttribute = $settings->get('orcidAttribute');
         $this->enableAuthentication = (boolean)$settings->get('enableAuthentication');
         $this->enableProfileSync = (boolean)$settings->get('enableProfileSync');
         $this->enableWorksFetch = (boolean)$settings->get('enableWorksFetch');

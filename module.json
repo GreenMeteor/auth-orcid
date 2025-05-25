@@ -12,10 +12,17 @@
     "authors": [
         {
             "name": "Green Meteor",
-            "email": "hello@https://greenmeteor.net",
-            "homepage": "https://https://greenmeteor.net",
+            "email": "hello@greenmeteor.net",
+            "homepage": "https://greenmeteor.net",
             "role": "Developer"
+        },
+        {
+            "name": "Ahmad Gharbeia",
+            "email": "ahmad@gharbeia.org",
+            "homepage": "https://ahmad@gharbeia.org",
+            "role": "Contributor"
         }
+
     ],
     "licence": "AGPL-3.0-or-later"
 }
