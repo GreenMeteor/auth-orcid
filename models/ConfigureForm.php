@@ -9,6 +9,7 @@ use yii\helpers\Url;
 class ConfigureForm extends Model
 {
     public $enabled;
+    public $oridAttribute;
     public $clientId;
     public $clientSecret;
     public $enableAuthentication;
@@ -34,7 +35,7 @@ class ConfigureForm extends Model
         return [
             'enabled' => Yii::t('AuthOrcidModule.base', 'Enabled'),
             'clientId' => Yii::t('AuthOrcidModule.base', 'ORCID Client ID'),
-            'orcidAttribute' => Yii::t('AuthOrcidModule.base', 'Internal name of profile attribute to hold ORCIDs. If not entered, {orcidAttribute} will be used.', ['orcidAttribute' => Html::tag('code', 'orcid')]),
+            'orcidAttribute' => Yii::t('AuthOrcidModule.base', 'Internal name of profile attribute to hold ORCIDs. If not entered, {orcidAttribute} will be used.', ['orcidAttribute' => 'orcid']),
             'clientSecret' => Yii::t('AuthOrcidModule.base', 'ORCID Client Secret'),
             'enableAuthentication' => Yii::t('AuthOrcidModule.base', 'Enable ORCID Authentication'),
             'enableProfileSync' => Yii::t('AuthOrcidModule.base', 'Enable Profile Synchronization'),
@@ -113,3 +114,4 @@ class ConfigureForm extends Model
         return $config;
     }
 }
+
