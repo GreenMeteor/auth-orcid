@@ -1,6 +1,6 @@
 {
     "id": "auth-orcid",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "ORCID Authentication",
     "description": "Adds ORCID authentication support to HumHub.",
     "humhub": {
@@ -26,3 +26,4 @@
     ],
     "licence": "AGPL-3.0-or-later"
 }
+
