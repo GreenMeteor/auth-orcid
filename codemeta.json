@@ -1,0 +1,60 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "@id": "https://github.com/GreenMeteor/auth-orcid",
+  "name": "ORCID Authentication",
+  "description": "HumHub module for OAuth via ORCID.org",
+  "codeRepository": "https://github.com/GreenMeteor/auth-orcid.git",
+  "issueTracker": "https://github.com/GreenMeteor/auth-orcid/issues",
+  "version": "1.0.0",
+  "dateCreated": "2025-12-10",
+  "dateModified": "2025-12-10",
+  "datePublished": "2025-12-10",
+
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "PHP"
+  },
+
+  "softwareRequirements": {
+    "@type": "SoftwareApplication",
+    "name": "HumHub",
+    "softwareVersion": ">=1.15",
+    "url": "https://github.com/humhub/humhub"
+  },
+
+  "license": "LGPL-3.0-or-later",
+
+  "author": [
+    {
+      "@id": "https://github.com/GreenMeteor",
+      "@type": "Person",
+      "name": "Green Meteor",
+      "givenName": "Green Meteor",
+      "email": "hello@greenmeteor.net",
+      "affiliation": {
+        "@type": "Organization",
+        "name": "GreenMeteor"
+      }
+    }
+  ],
+
+  "contributor": [
+    {
+      "@id": "https://orcid.org/0000-0003-3930-7811",
+      "@type": "Person",
+      "name": "Ahmad Gharbeia",
+      "givenName": "Ahmad",
+      "familyName": "Gharbeia",
+      "email": "ahmad@gharbeia.org"
+    }
+  ],
+
+  "keywords": [
+    "HumHub",
+    "ORCID",
+    "Authentication",
+    "Module",
+    "OAuth"
+  ]
+}
