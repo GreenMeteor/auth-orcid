@@ -190,8 +190,8 @@ class OrcidClient extends OAuth2
         parent::afterSave($user, $attributes);
 
         if (!empty($attributes['id'])) {
-            $fieldName = $this->orcidAttribute
-            $orcidField = ProfileField::findOne(['internal_name' => $this->$fieldName]);
+            $fieldName = $this->orcidAttribute;
+            $orcidField = ProfileField::findOne(['internal_name' => $fieldName]);
 
             if ($orcidField !== null) {
                 $profile = $user->profile;
@@ -234,3 +234,4 @@ class OrcidClient extends OAuth2
         return $category !== null ? $category->id : null;
     }
 }
+
