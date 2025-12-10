@@ -20,6 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <h4><?= Yii::t('AuthOrcidModule.base', 'ORCID API Credentials') ?></h4>
         <?= $form->field($model, 'clientId')->textInput(['autocomplete' => 'off']) ?>
         <?= $form->field($model, 'clientSecret')->passwordInput(['autocomplete' => 'off']) ?>
+        <?= $form->field($model, 'orcidAttribute')->textInput(['autocomplete' => 'off']) ?>
 
         <h4><?= Yii::t('AuthOrcidModule.base', 'Feature Settings') ?></h4>
         <?= $form->field($model, 'enableAuthentication')->checkbox() ?>
@@ -43,12 +44,13 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <div class="panel-body">
         <ol>
-            <li><?= Yii::t('AuthOrcidModule.base', 'Register your application at {orcidUrl}', ['orcidUrl' => Html::a('ORCID Developer Tools', 'https://orcid.org/developer-tools', ['target' => '_blank'])]) ?></li>
+            <li><?= Yii::t('AuthOrcidModule.base', 'Register your application at {toolsLink}', ['toolsLink' => Html::a('ORCID Developer Tools', 'https://orcid.org/developer-tools', ['target' => '_blank'])]) ?></li>
             <li><?= Yii::t('AuthOrcidModule.base', 'Set the Redirect URI to: {redirectUri}', ['redirectUri' => Html::tag('code', Url::to(['/user/auth/external', 'authclient' => 'orcid'], true))]) ?></li>
-            <li><?= Yii::t('AuthOrcidModule.base', 'Copy the provided Client ID and Client Secret to the fields above.') ?></li>
+            <li><?= Yii::t('AuthOrcidModule.base', 'Copy the provided Client ID and Client Secret to the relevant fields above.') ?></li>
             <li><?= Yii::t('AuthOrcidModule.base', 'Configure the desired features using the checkboxes above.') ?></li>
+            <li><?= Yii::t('AuthOrcidModule.base', 'Optionally, create a {adminLink} to hold users\' ORCIDs, and enter its internal name in the relevant field above.', ['adminLink' => Html::a('profile field', '/admin/user-profile', ['target' => '_blank'])]) ?></li>
             <li><?= Yii::t('AuthOrcidModule.base', 'Save the settings.') ?></li>
         </ol>
-        <p><?= Yii::t('AuthOrcidModule.base', 'For more information on ORCID integration, please refer to the {docLink}.', ['docLink' => Html::a('ORCID API documentation', 'https://info.orcid.org/documentation/', ['target' => '_blank'])]) ?></p>
+        <p><?= Yii::t('AuthOrcidModule.base', 'Refer to the {docsLink} for more information on ORCID integration.', ['docsLink' => Html::a('ORCID API documentation', 'https://info.orcid.org/documentation/', ['target' => '_blank'])]) ?></p>
     </div>
 </div>
