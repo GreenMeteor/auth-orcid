@@ -4,7 +4,7 @@ This HumHub module integrates ORCID authentication through OAuth, enabling users
 
 ## Requirements
 
-- HumHub version 1.15.x or later.
+- HumHub version 1.18.x+.
 - A valid [ORCID API client ID and secret](https://orcid.org/developer-tools).
-- PHP 8.0+
+- PHP 8.3+
 - `allow_url_fopen` **MUST** be enabled!
