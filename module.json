@@ -1,10 +1,11 @@
 {
     "id": "auth-orcid",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "ORCID Authentication",
     "description": "Adds ORCID authentication support to HumHub.",
     "humhub": {
-        "minVersion": "1.8"
+        "minVersion": "1.18",
+        "maxVersion": "1.19"
     },
     "keywords": ["authentication", "orcid", "oauth"],
     "screenshots": ["resources/screenshot.png"],

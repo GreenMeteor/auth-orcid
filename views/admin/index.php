@@ -1,8 +1,8 @@
 <?php
 
 use yii\helpers\Url;
-use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use humhub\helpers\Html;
+use humhub\widgets\form\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model humhub\modules\auth\orcid\models\ConfigureForm */
@@ -30,7 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= $form->field($model, 'enableEducationSync')->checkbox() ?>
         <?= $form->field($model, 'enableEmploymentSync')->checkbox() ?>
 
-        <div class="form-group">
+        <div class="mb-3">
             <?= Html::submitButton(Yii::t('AuthOrcidModule.base', 'Save'), ['class' => 'btn btn-primary', 'name' => 'save-button']) ?>
         </div>
 
